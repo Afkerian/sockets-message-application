@@ -97,12 +97,12 @@ int main(int argc, char* argv[])          /* input arguments are not used */
                 else if(len_rx == 0) /* if length is 0 client socket closed, then exit */
                 {
                     printf("[SERVER]: client socket closed \n\n");
-                    close(connfd);
+                    //close(connfd);
                     break; 
                 }
                 else
                 {
-                    write(connfd, buff_tx, strlen(buff_tx));
+                    write(connfd, buff_rx, strlen(buff_tx));
                     printf("[SERVER]: %s \n", buff_rx);
                 }            
             }  
