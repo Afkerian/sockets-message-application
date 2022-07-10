@@ -1,49 +1,111 @@
-// Strings y errores
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
+#include <unistd.h>  
 
-// Simbolos standard
-#include <unistd.h>
-
-// Sockets
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
+/* sockets */
+#include <netdb.h> 
+#include <netinet/in.h> 
+#include <sys/socket.h> 
+#include <sys/types.h> 
 #include <arpa/inet.h>
 
-// Parametros del servidor
-#define SERVER_PORT 8080
-#define SERVER_HOST_ADDRESS "192.168.100.36"
-#define BUFFER_SIZE 256
-#define BACK_LOG 5
+/* strings / errors*/
+#include <errno.h>
+#include <stdio.h> 
+#include <string.h> 
 
-int main(int argc, char *argv[])
-{
-    printf("Hello, World!\n");
-    printf("Socket Servidor\n");
+/* server parameters */
+#define SERV_PORT       10080              /* port */
+#define SERV_HOST_ADDR "192.168.100.36"     /* IP, only IPV4 support  */
+#define BUF_SIZE        256               /* Buffer rx, tx max size  */
+#define BACKLOG         5                 /* Max. client pending connections  */
 
-    int socket_file_description, socket_connection_file_description; // Escucha y Conexion de descriptores
-    unsigned int length;                                             // Tamano de la direccion del cliente
-
-    struct sockaddr_in server, client;
-
-    int len_recive, len_transmit = 0;
-
-    char buffer_recive[BUFFER_SIZE];
-    char buffer_transmit[BUFFER_SIZE];
-
-    socket_file_description = socket(AF_INET, SOCK_STREAM, 0);
-
-    if (socket_file_description < 0)
-    {
-        fprintf(stderr, "[SERVER-error]: socket creation failed. %d: %s \n", errno, strerror(errno));
+int main(int argc, char* argv[])          /* input arguments are not used */
+{ 
+    int sockfd, connfd ;  /* listening socket and connection socket file descriptors */
+    unsigned int len;     /* length of client address */
+    struct sockaddr_in servaddr, client; 
+    
+    int  len_rx, len_tx = 0;                     /* received and sent length, in bytes */
+    char buff_tx[BUF_SIZE] = "Hello client, I am the server";
+    char buff_rx[BUF_SIZE];   /* buffers for reception  */
+    
+     
+    /* socket creation */
+    sockfd = socket(AF_INET, SOCK_STREAM, 0); 
+    if (sockfd == -1) 
+    { 
+        fprintf(stderr, "[SERVER-error]: socket creation failed. %d: %s \n", errno, strerror( errno ));
         return -1;
-    }else{
-        printf("[SERVER - ON]");
+    } 
+    else
+    {
+        printf("[SERVER]: Socket successfully created..\n"); 
     }
-
-    return 0;
-}
+    
+    /* clear structure */
+    memset(&servaddr, 0, sizeof(servaddr));
+  
+    /* assign IP, SERV_PORT, IPV4 */
+    servaddr.sin_family      = AF_INET; 
+    servaddr.sin_addr.s_addr = inet_addr(SERV_HOST_ADDR); 
+    servaddr.sin_port        = htons(SERV_PORT); 
+    
+    
+    /* Bind socket */
+    if ((bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr))) != 0) 
+    { 
+        fprintf(stderr, "[SERVER-error]: socket bind failed. %d: %s \n", errno, strerror( errno ));
+        return -1;
+    } 
+    else
+    {
+        printf("[SERVER]: Socket successfully binded \n");
+    }
+  
+    /* Listen */
+    if ((listen(sockfd, BACKLOG)) != 0) 
+    { 
+        fprintf(stderr, "[SERVER-error]: socket listen failed. %d: %s \n", errno, strerror( errno ));
+        return -1;
+    } 
+    else
+    {
+        printf("[SERVER]: Listening on SERV_PORT %d \n\n", ntohs(servaddr.sin_port) ); 
+    }
+    
+    len = sizeof(client); 
+  
+      /* Accept the data from incoming sockets in a iterative way */
+      while(1)
+      {
+        connfd = accept(sockfd, (struct sockaddr *)&client, &len); 
+        if (connfd < 0) 
+        { 
+            fprintf(stderr, "[SERVER-error]: connection not accepted. %d: %s \n", errno, strerror( errno ));
+            return -1;
+        } 
+        else
+        {              
+            while(1) /* read data from a client socket till it is closed */ 
+            {  
+                /* read client message, copy it into buffer */
+                len_rx = read(connfd, buff_rx, sizeof(buff_rx));  
+                
+                if(len_rx == -1)
+                {
+                    fprintf(stderr, "[SERVER-error]: connfd cannot be read. %d: %s \n", errno, strerror( errno ));
+                }
+                else if(len_rx == 0) /* if length is 0 client socket closed, then exit */
+                {
+                    printf("[SERVER]: client socket closed \n\n");
+                    close(connfd);
+                    break; 
+                }
+                else
+                {
+                    write(connfd, buff_tx, strlen(buff_tx));
+                    printf("[SERVER]: %s \n", buff_rx);
+                }            
+            }  
+        }                      
+    }    
+} 
