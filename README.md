@@ -4,14 +4,14 @@ sockets message application with C and Java
 
 ---
 
-## The program provides sequential communication between two clients that are in the same network
+## The program provides sequential communication between two clients which are in the same network
 
 ---
 
 ### Instructions
 
 -   Execute makefile both in server and client folder
--   Change the address that is provided by default "192.168.100.36" for the one of the equipment that you are going to use as a server.
+-   Change the ip-address that is provided by default "192.168.100.36" for the one of the equipment you are going to use as a server.
 -   Do the above step for each of the client files, client1 and client2
 -   Finally run the server executable, secure client1 and client2
 -   Write the first message to client1 and immediately the server will send your message to client 2, where client2 will send the message to the server and the server the message to client1 and so on.
