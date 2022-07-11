@@ -24,5 +24,13 @@ This program corresponds to the subject of Distributed Computing of the [Nationa
 The code shown below was developed taking as an example the one provided in the course and
 [WhileTrueThenDream](https://github.com/WhileTrueThenDream/ExamplesCLinuxUserSpace/blob/master/server_secuencial.c), in addition to the solution that arises for the communication of clients through the server in [StackOverflow](https://stackoverflow.com/questions/41077820/c-language-sockets-a-chat-between-two-clients-using-one-server-as-middle-ma).
 
+--- 
+![client](https://github.com/Afkerian/sockets-message-application/blob/main/client.png)
+
+![server](https://github.com/Afkerian/sockets-message-application/blob/main/server.png)
+
+---
+
+It is proposed to improve this application by connecting a Java graphical interface with C through sockets.
 
 
