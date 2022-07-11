@@ -12,9 +12,6 @@
 #include <stdio.h>
 #include <string.h>
 
-// fonction pour comparer deux strings : renvoie 0 si les valeurs sont égales
-// et -1 sinon
-
 /* server parameters */
 #define SERV_PORT 10080                 /* port */
 #define SERV_HOST_ADDR "192.168.100.36" /* IP, only IPV4 support  */
@@ -42,7 +39,6 @@ int compare_strings(char a[], char b[])
 
 int main()
 {
-    // déclaration des variables : Serveur et deux Clients
     int sockfd, client1, client2;
     struct sockaddr_in server_addr;
     struct sockaddr_storage serverStorage;
@@ -90,7 +86,6 @@ int main()
         printf("[SERVER]: Listening on SERV_PORT %d \n\n", ntohs(server_addr.sin_port));
     }
 
-    // lier le serveur et les deux clients
     len = sizeof serverStorage;
 
     /* Accept the data from incoming sockets in a iterative way */
@@ -110,12 +105,12 @@ int main()
         while (cmdEXIT == 0)
         {
             /* receive message from client1 */
-            // recv(client1, buffer, BUF_SIZE, 0);
-            read(client1, buffer, sizeof(buffer));
+             recv(client1, buffer, BUF_SIZE, 0);
+            //read(client1, buffer, sizeof(buffer));
             /* send it back to client2 */
             printf("%s\nSend to client2\n", buffer);
-            // send(client2, buffer, BUF_SIZE, 0);
-            write(client2, buffer, strlen(buffer));
+             send(client2, buffer, BUF_SIZE, 0);
+            //write(client2, buffer, strlen(buffer));
 
             /* Exit the loop if the client1 types exit */
             if (compare_strings(buffer, "exit") == 0)
@@ -127,12 +122,12 @@ int main()
                 /* otherwise empty the buffer */
                 memset(&buffer[0], 0, sizeof(buffer));
                 /* receive message from client2 */
-                //recv(client2, buffer, BUF_SIZE, 0);
-                read(client2, buffer, sizeof(buffer));
+                recv(client2, buffer, BUF_SIZE, 0);
+                //read(client2, buffer, sizeof(buffer));
                 /* send it back to client1 */
                 printf("%s\nSend to client1\n", buffer);
-                //send(client1, buffer, BUF_SIZE, 0);
-                write(client1, buffer, strlen(buffer));
+                send(client1, buffer, BUF_SIZE, 0);
+                //write(client1, buffer, strlen(buffer));
                 /* if client2 sent "exit" */
                 if (compare_strings(buffer, "exit") == 0)
                 {
